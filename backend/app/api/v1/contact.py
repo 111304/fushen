@@ -1,6 +1,8 @@
 """联系表单路由 - MongoDB 存储"""
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Request
+
+from core.ratelimit import check_contact_rate_limit
 from db.core.mongo_db import get_mongo_db
 from schemas.contact import ContactCreate
 from services import contact_service
@@ -9,7 +11,10 @@ router = APIRouter(prefix="/contact", tags=["联系我们"])
 
 
 @router.post("", summary="提交联系表单")
-async def submit_contact(data: ContactCreate):
+async def submit_contact(request: Request, data: ContactCreate):
+    # 防刷限流：每 IP 60 秒 1 条、每天 10 条，超限抛 429（不写库）
+    check_contact_rate_limit(request)
+
     db = get_mongo_db()
     message_id = await contact_service.submit_contact(db, data)
     return {"code": 200, "message": "提交成功", "data": {"id": message_id}}
