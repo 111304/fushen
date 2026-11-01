@@ -22,7 +22,8 @@ services:
       TZ: Asia/Shanghai
     ports:
       # 仅绑定本机回环：公网不可访问，服务器上可用 SSH 隧道管理
-      - "127.0.0.1:3306:3306"
+      # 注意端口用 13306/16379 而非默认值：宝塔等面板常在宿主机自带 MySQL/Redis 占用默认端口
+      - "127.0.0.1:13306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     command:
@@ -44,7 +45,7 @@ services:
     container_name: stellar-redis
     restart: unless-stopped
     ports:
-      - "127.0.0.1:6379:6379"
+      - "127.0.0.1:16379:6379"
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
