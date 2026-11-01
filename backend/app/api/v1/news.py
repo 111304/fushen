@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from api.deps import db_session
-from schemas.news import NewsInfo, NewsrCeate, NewsUpdate, PageResult
+from schemas.news import NewsInfo, NewsCreate, NewsUpdate, PageResult
 from services import news_service
 
 router = APIRouter(prefix="/news", tags=["新闻动态"])
