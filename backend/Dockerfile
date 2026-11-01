@@ -72,5 +72,6 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
 # 注意：项目代码采用扁平导入（from core.xxx / from api.xxx / from schemas.xxx），
 # backend 的 app/ 目录作为扁平导入路径根，因此用 --app-dir /app/backend/app 指定模块搜索路径。
 # 同时 db 包位于项目根（/app/db），需通过 PYTHONPATH=/app 暴露，否则报 ModuleNotFoundError。
+# worker 数由环境变量 WEB_CONCURRENCY 控制（uvicorn 原生支持），compose 中按服务器核数配置。
 ENV PYTHONPATH="/app"
-CMD ["uvicorn", "main:app", "--app-dir", "/app/backend/app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
+CMD ["uvicorn", "main:app", "--app-dir", "/app/backend/app", "--host", "0.0.0.0", "--port", "8000"]

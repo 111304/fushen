@@ -21,7 +21,8 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-stellar_tech}
       TZ: Asia/Shanghai
     ports:
-      - "3306:3306"
+      # 仅绑定本机回环：公网不可访问，服务器上可用 SSH 隧道管理
+      - "127.0.0.1:3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     command:
@@ -43,7 +44,7 @@ services:
     container_name: stellar-redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
@@ -64,7 +65,7 @@ services:
       MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-stellar_tech}
       TZ: Asia/Shanghai
     ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"
     volumes:
       - mongo_data:/data/db
     healthcheck:
@@ -113,10 +114,12 @@ services:
       # App
       APP_TITLE: "星辰科技公司网站API"
       APP_VERSION: "1.0.0"
+      # uvicorn worker 数（Dockerfile CMD 不再写死 --workers，由此变量控制）
+      WEB_CONCURRENCY: "4"
       CORS_ORIGINS: "http://localhost:5173,http://127.0.0.1:5173,http://localhost"
       CACHE_TTL: "3600"
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://127.0.0.1:8000/"]
       interval: 30s

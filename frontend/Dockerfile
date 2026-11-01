@@ -33,6 +33,9 @@ FROM nginx:1.27.1-alpine AS runtime
 # 移除默认配置
 RUN rm /etc/nginx/conf.d/default.conf
 
+# 提升 worker 连接数上限（官方镜像默认 1024，按 1000 人在线目标调大）
+RUN sed -i -E 's/worker_connections[[:space:]]+[0-9]+;/worker_connections 4096;/' /etc/nginx/nginx.conf
+
 # 复制自定义 Nginx 配置（SPA 路由 + API 反向代理）
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
