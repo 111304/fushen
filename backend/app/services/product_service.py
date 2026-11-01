@@ -101,7 +101,7 @@ def update_product(db: Session, product_id: int, data: ProductUpdate) -> Product
     db.commit()
     db.refresh(product)
 
-    _invalidate_cache()
+    _invalidate_cache(product_id)
     return _to_info(product)
 
 
@@ -113,11 +113,16 @@ def delete_product(db: Session, product_id: int) -> bool:
 
     db.delete(product)
     db.commit()
-    _invalidate_cache()
+    _invalidate_cache(product_id)
     return True
 
 
-def _invalidate_cache():
-    """清除产品相关缓存"""
-    for pattern_key in [CACHE_KEY_PRODUCTS, CACHE_KEY_PRODUCT_DETAIL]:
-        redis_client.delete(pattern_key)
+def _invalidate_cache(product_id: int | None = None) -> None:
+    """清除产品相关缓存
+
+    列表缓存键带分类后缀（products:list:all 等），明细键带真实 id，
+    因此不能直接删除模板常量，需按前缀/格式化后的实际键清除。
+    """
+    redis_client.delete_pattern(f"{CACHE_KEY_PRODUCTS}:*")
+    if product_id is not None:
+        redis_client.delete(CACHE_KEY_PRODUCT_DETAIL.format(id=product_id))

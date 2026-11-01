@@ -1,6 +1,6 @@
 """联系表单路由 - MongoDB 存储"""
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from db.core.mongo_db import get_mongo_db
 from schemas.contact import ContactCreate
 from services import contact_service
@@ -16,7 +16,11 @@ async def submit_contact(data: ContactCreate):
 
 
 @router.get("", summary="获取联系消息列表(管理后台用)")
-async def get_contact_list(page: int = 1, page_size: int = 20, status: str | None = None):
+async def get_contact_list(
+    page: int = Query(1, ge=1, description="页码，从 1 开始"),
+    page_size: int = Query(20, ge=1, le=100, description="每页条数，最大 100"),
+    status: str | None = None,
+):
     db = get_mongo_db()
     result = await contact_service.get_contact_list(db, page, page_size, status)
     return {"code": 200, "message": "success", "data": result}

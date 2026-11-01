@@ -1,6 +1,6 @@
 """新闻动态路由"""
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from api.deps import db_session
@@ -12,8 +12,8 @@ router = APIRouter(prefix="/news", tags=["新闻动态"])
 
 @router.get("", response_model=PageResult, summary="获取新闻列表(分页)")
 def get_news_list(
-    page: int = 1,
-    page_size: int = 10,
+    page: int = Query(1, ge=1, description="页码，从 1 开始"),
+    page_size: int = Query(10, ge=1, le=100, description="每页条数，最大 100"),
     category: str | None = None,
     db: Session = db_session(),
 ):

@@ -103,7 +103,7 @@ def update_news(db: Session, news_id: int, data: NewsUpdate) -> NewsInfo | None:
     db.commit()
     db.refresh(news)
 
-    _invalidate_cache()
+    _invalidate_cache(news_id)
     return _to_info(news)
 
 
@@ -115,10 +115,16 @@ def delete_news(db: Session, news_id: int) -> bool:
 
     db.delete(news)
     db.commit()
-    _invalidate_cache()
+    _invalidate_cache(news_id)
     return True
 
 
-def _invalidate_cache():
-    """清除新闻相关缓存（简化处理：清除已知前缀）"""
-    redis_client.delete(CACHE_KEY_NEWS_LIST)
+def _invalidate_cache(news_id: int | None = None) -> None:
+    """清除新闻相关缓存
+
+    列表缓存键含分类/页码/条数（news:list:all:1:10 等），明细键含真实 id，
+    模板常量本身不是真实键，必须按前缀或格式化后的键清除。
+    """
+    redis_client.delete_pattern("news:list:*")
+    if news_id is not None:
+        redis_client.delete(CACHE_KEY_NEWS_DETAIL.format(id=news_id))

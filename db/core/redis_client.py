@@ -34,6 +34,16 @@ class RedisClient:
         """删除缓存"""
         self._client.delete(*keys)
 
+    def delete_pattern(self, pattern: str) -> int:
+        """按通配符批量删除缓存键
+
+        使用 SCAN 增量遍历，避免 KEYS 在大 key 空间下阻塞 Redis。
+        """
+        deleted = 0
+        for key in self._client.scan_iter(match=pattern, count=200):
+            deleted += self._client.delete(key)
+        return deleted
+
     def incr(self, key: str, amount: int = 1) -> int:
         """自增计数器"""
         return self._client.incr(key, amount)

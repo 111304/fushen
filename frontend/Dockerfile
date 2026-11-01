@@ -42,9 +42,9 @@ COPY --from=builder /build/dist /usr/share/nginx/html
 # 暴露 HTTP 端口
 EXPOSE 80
 
-# 健康检查
+# 健康检查（用 127.0.0.1：容器内 localhost 会优先解析到 ::1，而 nginx 只监听 IPv4）
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-    CMD wget -q --spider http://localhost/ || exit 1
+    CMD wget -q --spider http://127.0.0.1/ || exit 1
 
 # 启动 Nginx（前台运行）
 CMD ["nginx", "-g", "daemon off;"]

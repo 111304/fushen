@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from bson import ObjectId
+from bson.errors import InvalidId
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from schemas.contact import ContactCreate, ContactInfo
@@ -61,8 +62,14 @@ async def update_contact_status(
     db: AsyncIOMotorDatabase, message_id: str, status: str
 ) -> bool:
     """更新联系消息状态"""
+    try:
+        object_id = ObjectId(message_id)
+    except (InvalidId, TypeError):
+        # 传入的不是合法 ObjectId，按“消息不存在”处理，避免抛 500
+        return False
+
     result = await db[COLLECTION_NAME].update_one(
-        {"_id": ObjectId(message_id)},
+        {"_id": object_id},
         {"$set": {"status": status}},
     )
     return result.modified_count > 0

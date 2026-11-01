@@ -66,7 +66,7 @@ EXPOSE 8000
 
 # 健康检查 — FastAPI 根路由返回 {"status":"ok"}
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-    CMD curl -sf http://localhost:8000/ || exit 1
+    CMD curl -sf http://127.0.0.1:8000/ || exit 1
 
 # 启动命令
 # 注意：项目代码采用扁平导入（from core.xxx / from api.xxx / from schemas.xxx），
