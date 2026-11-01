@@ -1,0 +1,12 @@
+# ============ 应用运行依赖 ============
+# 数据库相关依赖（sqlalchemy/pymysql/alembic/redis/motor/pymongo）已拆分到
+# 同级 db 包的 db/requirements.txt。本地安装请执行：
+#   pip install -r backend/requirements.txt -r db/requirements.txt
+
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+pydantic==2.7.1
+pydantic-settings==2.2.1
+python-multipart==0.0.9
+python-dotenv==1.0.1
+

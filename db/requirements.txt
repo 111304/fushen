@@ -1,0 +1,21 @@
+# ============ 数据库层依赖（独立 db 包）============
+# 与 backend/requirements.txt 一起安装：
+#   pip install -r backend/requirements.txt -r db/requirements.txt
+
+# MySQL ORM 与驱动
+sqlalchemy==2.0.30
+pymysql==1.1.0
+alembic==1.13.1
+
+# Redis 客户端
+redis==5.0.4
+
+# MongoDB (Motor 异步驱动)
+# motor 3.4.0 与新版 pymongo(4.9+)不兼容（_QUERY_OPTIONS 私有 API 被移除）
+# 升级到 3.7.1 并显式 pin pymongo 版本，保证可复现构建
+motor==3.7.1
+pymongo==4.17.0
+
+# db/config.py 使用 pydantic-settings 读取配置
+pydantic==2.7.1
+pydantic-settings==2.2.1

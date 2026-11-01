@@ -1,0 +1,33 @@
+# Python 缓存与虚拟环境
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+
+# 环境变量文件（不内置到镜像）
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log
+
+# Docker 自身
+Dockerfile
+.dockerignore
+
+# 文档
+README.md
