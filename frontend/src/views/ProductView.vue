@@ -11,10 +11,10 @@ const activeCategory = ref<string>('全部')
 const selectedProduct = ref<Product | null>(null)
 const showModal = ref(false)
 
-const categories = computed(() => {
-  const cats = new Set(products.value.map((p) => p.category))
-  return ['全部', ...Array.from(cats)]
-})
+// 分类快照：首次全量加载时提取一次，之后筛选只影响卡片列表，按钮数量与位置保持不变
+const allCategories = ref<string[]>([])
+
+const categories = computed(() => ['全部', ...allCategories.value])
 
 const filteredProducts = computed(() => {
   if (activeCategory.value === '全部') return products.value
@@ -30,11 +30,17 @@ function handleProductClick(product: Product) {
   showModal.value = true
 }
 
-onMounted(() => fetchProducts())
+// 全量加载产品，并同步刷新分类快照
+async function loadAll() {
+  await fetchProducts()
+  allCategories.value = Array.from(new Set(products.value.map((p) => p.category)))
+}
+
+onMounted(() => loadAll())
 
 watch(activeCategory, (cat) => {
   if (cat === '全部') {
-    fetchProducts()
+    loadAll()
   } else {
     fetchProducts(cat)
   }

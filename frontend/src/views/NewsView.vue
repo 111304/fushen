@@ -5,7 +5,7 @@ import SectionTitle from '@/components/SectionTitle.vue'
 import { useCompanyData } from '@/composables/useCompanyData'
 import type { NewsItem, PageResult } from '@/types'
 
-const { news, fetchNews } = useCompanyData()
+const { fetchNews } = useCompanyData()
 
 const activeCategory = ref<string>('全部')
 const currentPage = ref(1)
@@ -19,10 +19,10 @@ const pageResult = reactive<{ list: NewsItem[]; total: number }>({
   total: 0,
 })
 
-const categories = computed(() => {
-  const cats = new Set(news.value.map((n) => n.category))
-  return ['全部', ...Array.from(cats)]
-})
+// 分类快照：进页面时拉一次大分页提取全部分类，之后筛选/翻页不再改变按钮数量与位置
+const allCategories = ref<string[]>([])
+
+const categories = computed(() => ['全部', ...allCategories.value])
 
 async function loadData() {
   const cat = activeCategory.value === '全部' ? undefined : activeCategory.value
@@ -46,7 +46,16 @@ function handleNewsClick(item: NewsItem) {
   showModal.value = true
 }
 
-onMounted(loadData)
+// 拉一次大分页（当前数据量远小于 100 条），确保按钮包含所有分类
+async function loadCategories() {
+  const res: PageResult<NewsItem> = await fetchNews(1, 100)
+  allCategories.value = Array.from(new Set(res.list.map((n) => n.category)))
+}
+
+onMounted(() => {
+  loadData()
+  loadCategories()
+})
 
 watch([activeCategory, currentPage], loadData)
 </script>
